@@ -19,29 +19,29 @@ function SND(x){
 }
 
 
-function BlackScholes(PutCallFlag, S, K, T, r, v, i) {
+function BlackScholes(PutCallFlag, S, K, T, q, r, v) {
 
 var d1, d2;
-d1 = (Math.log(S / K) + (r + v * v / 2.0) * T) / (v * Math.sqrt(T));
+d1 = (Math.log(S / K) + (r - q + v * v / 2.0) * T) / (v * Math.sqrt(T));
 d2 = d1 - v * Math.sqrt(T);
 
 if (PutCallFlag== "c"){
-	return Math.exp(-i*T) * (S * CND(d1)-K * Math.exp(-r * T) * CND(d2));
+	return Math.exp(-q*T) * S * CND(d1) - Math.exp(-r*T) * K * CND(d2);
 	}
 else{
-	return Math.exp(-i*T) * (K * Math.exp(-r * T) * CND(-d2) - S * CND(-d1));
+	return Math.exp(-r*T) * K * CND(-d2) - Math.exp(-q*T) * S * CND(-d1);
 	}
 }
 
 
-function Forward(S, T, r){
-return S * Math.exp(r*T);
+function Forward(S, T, q, r){
+return S * Math.exp((r-q)*T);
 }
 
-function Delta(PutCallFlag, S, K, T, r, v) {
+function Delta(PutCallFlag, S, K, T, q, r, v) {
 
 var d1, d2;
-d1 = (Math.log(S / K) + (r + v * v / 2.0) * T) / (v * Math.sqrt(T));
+d1 = (Math.log(S / K) + (r - q + v * v / 2.0) * T) / (v * Math.sqrt(T));
 d2 = d1 - v * Math.sqrt(T);
 
 if (PutCallFlag== "c"){
@@ -52,10 +52,10 @@ else{
 	}
  }
 
- function Gamma(S, K, T, r, v) {
+ function Gamma(S, K, T, q, r, v) {
 
   var d1, d2;
-  d1 = (Math.log(S / K) + (r + v * v / 2.0) * T) / (v * Math.sqrt(T));
+  d1 = (Math.log(S / K) + (r - q + v * v / 2.0) * T) / (v * Math.sqrt(T));
   d2 = d1 - v * Math.sqrt(T);
 
   return Math.exp(-r*T) * SND(d1) / (S*v*Math.sqrt(T));

@@ -30,7 +30,7 @@ var svg = d3.select("#mainGraph")
 
 
 $(document).ready(function(){
-  
+
 	$("#sliderSpot").slider({
 		min: 1,
   		max: 200,
@@ -55,7 +55,7 @@ $(document).ready(function(){
   		change:function(){update();}
 		});
 
-	$("#sliderR1").slider({
+	$("#sliderR").slider({
 		min: -0.1,
   		max: 0.1,
   		step: 0.005,
@@ -63,7 +63,7 @@ $(document).ready(function(){
   		change:function(){update();}
 		});
 
-  $("#sliderR2").slider({
+  $("#sliderQ").slider({
     min: -0.1,
       max: 0.1,
       step: 0.005,
@@ -120,29 +120,29 @@ function update(){
 	Spot=$("#sliderSpot").slider("value");
 	Strike=$("#sliderStrike").slider("value");
 	Mat=$("#sliderMaturity").slider("value");
-	R1=$("#sliderR1").slider("value");
-  R2=$("#sliderR2").slider("value");
+	R=$("#sliderR").slider("value");
+  Q=$("#sliderQ").slider("value");
 	Vol=$("#sliderVol").slider("value");
 
-  Drift = R1 - R2;
+  Drift = Q - R;
 
-  spotForward = Forward(Spot, Mat, Drift);
+  spotForward = Forward(Spot, Mat, Q, R);
 
-  callPremium = BlackScholes("c", Spot, Strike, Mat, Drift, Vol, R2);
+  callPremium = BlackScholes("c", Spot, Strike, Mat, Q, R, Vol);
 
-	putPremium = BlackScholes("p", Spot, Strike, Mat, Drift, Vol, R2);
+	putPremium = BlackScholes("p", Spot, Strike, Mat, Q, R, Vol);
 
-	callDelta = Delta("c", Spot, Strike, Mat, Drift, Vol);
+	callDelta = Delta("c", Spot, Strike, Mat, Q, R, Vol);
 
-	putDelta = Delta("p", Spot, Strike, Mat, Drift, Vol);	
+	putDelta = Delta("p", Spot, Strike, Mat, Q, R, Vol);	
 
   
   $("#Drift span").html(Math.round(10000*Drift)/100);
   $("#spotForward span").html(Math.round(100*spotForward)/100);
 	$("#Strike span").html(Strike);
 	$("#Maturity span").html(Mat);
-	$("#R1 span").html(100 * R1);
-	$("#R2 span").html(100 * R2);
+	$("#R span").html(100 * R);
+	$("#Q span").html(100 * Q);
   $("#Volatility span").html(100*Vol);
 	$("#Spot span").html(Spot);
 
@@ -158,7 +158,7 @@ function update(){
 	yScale.domain([Strike, 0]);
 	yScale2.domain([1, 0]);
 
-	callCurve(Strike, Mat, Drift, Vol);
+	callCurve(Strike, Mat, Q, R, Vol);
   
 	plot();
 
@@ -281,7 +281,7 @@ var yAxis2 = d3.svg.axis()
 
     bar.exit().remove();
 
-var ySpot = BlackScholes("c", Spot, Strike, Mat, Drift, Vol);
+var ySpot = BlackScholes("c", Spot, Strike, Mat, Q, R, Vol);
 var zSpot = Math.max(0, Spot - Strike);
 
     svg.append("rect")
@@ -339,17 +339,17 @@ svg.append("text").text("Delta").attr("x",leftPadding*2).attr('y',20 + topPaddin
 
 var callLineData = [];
 
-function callCurve(K, T, r, v){
+function callCurve(K, T, q, r, v){
 	callSpotData = [];
   callLineData = [];
   	// var path = Math.round(100* K / uw)/100;
 	// console.log(K, T, r, v, Strike);	
 	for (var i = 0; i < uw ; i +=2) {           				
 	    var x = i  * 2 *  K / uw;
-	    var y = BlackScholes("c", x, K, T, r, v, R2);  
+	    var y = BlackScholes("c", x, K, T, Q, R, v);  
 	   // var z = Math.max(0, x - K);
 	   // var optionvalue = y - z;
-      var delta = Delta("c", x, K, T, r, v);
+      var delta = Delta("c", x, K, T, Q, R, v);
 	  //  var highlight = function(t){if (Math.round(t)==Spot) {return 1} else {return 0}};
 	  
 	  //console.log( Math.round(x), y, optionvalue, highlight(x));
